@@ -1,6 +1,12 @@
-package cc.solart.wave;
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
+
+package io.jasontsang.pandora.widget;
 
 import android.animation.ValueAnimator;
+import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -8,43 +14,31 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.os.Build;
+import android.graphics.Paint.Align;
+import android.graphics.Paint.FontMetrics;
+import android.graphics.Paint.Style;
+import android.graphics.Path.Direction;
+import android.graphics.Path.Op;
+import android.os.Build.VERSION;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-
+import cc.solart.wave.R.array;
+import cc.solart.wave.R.dimen;
+import cc.solart.wave.R.styleable;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * 波浪侧边栏
- * author: imilk
- * https://github.com/Solartisan/WaveSideBar.git
- */
 public class WaveSideBarView extends View {
-
     private static final String TAG = "WaveSlideBarView";
-
-    // 计算波浪贝塞尔曲线的角弧长值
-    private static final double ANGLE = Math.PI * 45 / 180;
-    private static final double ANGLE_R = Math.PI * 90 / 180;
-    private OnTouchLetterChangeListener listener;
-
-    // 渲染字母表
+    private static final double ANGLE = 0.7853981633974483D;
+    private static final double ANGLE_R = 1.5707963267948966D;
+    private WaveSideBarView.OnTouchLetterChangeListener listener;
     private List<String> mLetters;
-
-    // 当前选中的位置
-    private int mChoose = -1;
-
-    // 字母列表画笔
-    private Paint mLettersPaint = new Paint();
-
-    // 提示字母画笔
-    private Paint mTextPaint = new Paint();
-    // 波浪画笔
-    private Paint mWavePaint = new Paint();
-
+    private int mChoose;
+    private Paint mLettersPaint;
+    private Paint mTextPaint;
+    private Paint mWavePaint;
     private float mTextSize;
     private float mLargeTextSize;
     private int mTextColor;
@@ -54,35 +48,19 @@ public class WaveSideBarView extends View {
     private int mHeight;
     private int mItemHeight;
     private int mPadding;
-
-    // 波浪路径
-    private Path mWavePath = new Path();
-
-    // 圆形路径
-    private Path mBallPath = new Path();
-
-    // 手指滑动的Y点作为中心点
-    private int mCenterY; //中心点Y
-
-    // 贝塞尔曲线的分布半径
+    private Path mWavePath;
+    private Path mBallPath;
+    private int mCenterY;
     private int mRadius;
-
-    // 圆形半径
     private int mBallRadius;
-    // 用于过渡效果计算
     ValueAnimator mRatioAnimator;
-
-    // 用于绘制贝塞尔曲线的比率
     private float mRatio;
-
-    // 选中字体的坐标
-    private float mPosX, mPosY;
-
-    // 圆形中心点X
+    private float mPosX;
+    private float mPosY;
     private float mBallCentreX;
 
     public WaveSideBarView(Context context) {
-        this(context, null);
+        this(context, (AttributeSet)null);
     }
 
     public WaveSideBarView(Context context, AttributeSet attrs) {
@@ -91,250 +69,210 @@ public class WaveSideBarView extends View {
 
     public WaveSideBarView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init(context, attrs);
+        this.mChoose = -1;
+        this.mLettersPaint = new Paint();
+        this.mTextPaint = new Paint();
+        this.mWavePaint = new Paint();
+        this.mWavePath = new Path();
+        this.mBallPath = new Path();
+        this.init(context, attrs);
     }
 
     private void init(Context context, AttributeSet attrs) {
-        mLetters = Arrays.asList(context.getResources().getStringArray(R.array.waveSideBarLetters));
-
-        mTextColor = Color.parseColor("#969696");
-        mWaveColor = Color.parseColor("#be69be91");
-        mTextColorChoose = context.getResources().getColor(android.R.color.white);
-        mTextSize = context.getResources().getDimensionPixelSize(R.dimen.textSize_sidebar);
-        mLargeTextSize = context.getResources().getDimensionPixelSize(R.dimen.large_textSize_sidebar);
-        mPadding = context.getResources().getDimensionPixelSize(R.dimen.textSize_sidebar_padding);
-        if (attrs != null) {
-            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.WaveSideBarView);
-            mTextColor = a.getColor(R.styleable.WaveSideBarView_sidebarTextColor, mTextColor);
-            mTextColorChoose = a.getColor(R.styleable.WaveSideBarView_sidebarChooseTextColor, mTextColorChoose);
-            mTextSize = a.getFloat(R.styleable.WaveSideBarView_sidebarTextSize, mTextSize);
-            mLargeTextSize = a.getFloat(R.styleable.WaveSideBarView_sidebarLargeTextSize, mLargeTextSize);
-            mWaveColor = a.getColor(R.styleable.WaveSideBarView_sidebarBackgroundColor, mWaveColor);
-            mRadius = a.getColor(R.styleable.WaveSideBarView_sidebarRadius, context.getResources().getDimensionPixelSize(R.dimen.radius_sidebar));
-            mBallRadius = a.getColor(R.styleable.WaveSideBarView_sidebarBallRadius, context.getResources().getDimensionPixelSize(R.dimen.ball_radius_sidebar));
+        this.mLetters = Arrays.asList(context.getResources().getStringArray(array.waveSideBarLetters));
+        this.mTextColor = Color.parseColor("#969696");
+        this.mWaveColor = Color.parseColor("#be69be91");
+        this.mTextColorChoose = context.getResources().getColor(17170443);
+        this.mTextSize = (float)context.getResources().getDimensionPixelSize(dimen.textSize_sidebar);
+        this.mLargeTextSize = (float)context.getResources().getDimensionPixelSize(dimen.large_textSize_sidebar);
+        this.mPadding = context.getResources().getDimensionPixelSize(dimen.textSize_sidebar_padding);
+        if(attrs != null) {
+            TypedArray a = this.getContext().obtainStyledAttributes(attrs, styleable.WaveSideBarView);
+            this.mTextColor = a.getColor(styleable.WaveSideBarView_sidebarTextColor, this.mTextColor);
+            this.mTextColorChoose = a.getColor(styleable.WaveSideBarView_sidebarChooseTextColor, this.mTextColorChoose);
+            this.mTextSize = a.getFloat(styleable.WaveSideBarView_sidebarTextSize, this.mTextSize);
+            this.mLargeTextSize = a.getFloat(styleable.WaveSideBarView_sidebarLargeTextSize, this.mLargeTextSize);
+            this.mWaveColor = a.getColor(styleable.WaveSideBarView_sidebarBackgroundColor, this.mWaveColor);
+            this.mRadius = a.getColor(styleable.WaveSideBarView_sidebarRadius, context.getResources().getDimensionPixelSize(dimen.radius_sidebar));
+            this.mBallRadius = a.getColor(styleable.WaveSideBarView_sidebarBallRadius, context.getResources().getDimensionPixelSize(dimen.ball_radius_sidebar));
             a.recycle();
         }
 
-        mWavePaint = new Paint();
-        mWavePaint.setAntiAlias(true);
-        mWavePaint.setStyle(Paint.Style.FILL);
-        mWavePaint.setColor(mWaveColor);
-
-        mTextPaint.setAntiAlias(true);
-        mTextPaint.setColor(mTextColorChoose);
-        mTextPaint.setStyle(Paint.Style.FILL);
-        mTextPaint.setTextSize(mLargeTextSize);
-        mTextPaint.setTextAlign(Paint.Align.CENTER);
+        this.mWavePaint = new Paint();
+        this.mWavePaint.setAntiAlias(true);
+        this.mWavePaint.setStyle(Style.FILL);
+        this.mWavePaint.setColor(this.mWaveColor);
+        this.mTextPaint.setAntiAlias(true);
+        this.mTextPaint.setColor(this.mTextColorChoose);
+        this.mTextPaint.setStyle(Style.FILL);
+        this.mTextPaint.setTextSize(this.mLargeTextSize);
+        this.mTextPaint.setTextAlign(Align.CENTER);
     }
 
-    @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        final float y = event.getY();
-        final float x = event.getX();
-
-        final int oldChoose = mChoose;
-        final int newChoose = (int) (y / mHeight * mLetters.size());
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-
-                if (x < mWidth - 2 * mRadius) {
+        float y = event.getY();
+        float x = event.getX();
+        int oldChoose = this.mChoose;
+        int newChoose = (int)(y / (float)this.mHeight * (float)this.mLetters.size());
+        switch(event.getAction()) {
+            case 0:
+                if(x < (float)(this.mWidth - 2 * this.mRadius)) {
                     return false;
                 }
-                startAnimator(mRatio, 1.0f);
-                break;
-            case MotionEvent.ACTION_MOVE:
 
-                mCenterY = (int) y;
-                if (oldChoose != newChoose) {
-                    if (newChoose >= 0 && newChoose < mLetters.size()) {
-                        mChoose = newChoose;
-                        if (listener != null) {
-                            listener.onLetterChange(mLetters.get(newChoose));
-                        }
+                this.startAnimator(new float[]{this.mRatio, 1.0F});
+                break;
+            case 1:
+            case 3:
+                this.startAnimator(new float[]{this.mRatio, 0.0F});
+                this.mChoose = -1;
+                break;
+            case 2:
+                this.mCenterY = (int)y;
+                if(oldChoose != newChoose && newChoose >= 0 && newChoose < this.mLetters.size()) {
+                    this.mChoose = newChoose;
+                    if(this.listener != null) {
+                        this.listener.onLetterChange((String)this.mLetters.get(newChoose));
                     }
                 }
-                invalidate();
-                break;
-            case MotionEvent.ACTION_CANCEL:
-            case MotionEvent.ACTION_UP:
 
-                startAnimator(mRatio, 0f);
-                mChoose = -1;
-                break;
-            default:
-                break;
+                this.invalidate();
         }
+
         return true;
     }
 
-    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        mHeight = getHeight();
-        mWidth = getWidth();
-        mItemHeight = (mHeight - mPadding) / mLetters.size();
-        mPosX = mWidth - 1.6f * mTextSize;
     }
 
-    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        //绘制字母列表
-        drawLetters(canvas);
 
-        //绘制波浪
-        drawWavePath(canvas);
+        this.mHeight = this.getHeight();
+        this.mWidth = this.getWidth();
+        this.mItemHeight = (this.mHeight - this.mPadding) / this.mLetters.size();
+        this.mPosX = (float)this.mWidth - 1.6F * this.mTextSize;
 
-        //绘制圆
-        drawBallPath(canvas);
-
-        //绘制选中的字体
-        drawChooseText(canvas);
-
+        this.drawLetters(canvas);
+        this.drawWavePath(canvas);
+        this.drawBallPath(canvas);
+        this.drawChooseText(canvas);
     }
 
     private void drawLetters(Canvas canvas) {
-
         RectF rectF = new RectF();
-        rectF.left = mPosX - mTextSize;
-        rectF.right = mPosX + mTextSize;
-        rectF.top = mTextSize / 2;
-        rectF.bottom = mHeight - mTextSize / 2;
+        rectF.left = this.mPosX - this.mTextSize;
+        rectF.right = this.mPosX + this.mTextSize;
+        rectF.top = this.mTextSize / 2.0F;
+        rectF.bottom = (float)this.mHeight - this.mTextSize / 2.0F;
+        this.mLettersPaint.reset();
+        this.mLettersPaint.setStyle(Style.FILL);
+        this.mLettersPaint.setColor(Color.parseColor("#F9F9F9"));
+        this.mLettersPaint.setAntiAlias(true);
+        canvas.drawRoundRect(rectF, this.mTextSize, this.mTextSize, this.mLettersPaint);
+        this.mLettersPaint.reset();
+        this.mLettersPaint.setStyle(Style.STROKE);
+        this.mLettersPaint.setColor(this.mTextColor);
+        this.mLettersPaint.setAntiAlias(true);
+        canvas.drawRoundRect(rectF, this.mTextSize, this.mTextSize, this.mLettersPaint);
 
-        mLettersPaint.reset();
-        mLettersPaint.setStyle(Paint.Style.FILL);
-        mLettersPaint.setColor(Color.parseColor("#F9F9F9"));
-        mLettersPaint.setAntiAlias(true);
-        canvas.drawRoundRect(rectF, mTextSize, mTextSize, mLettersPaint);
-
-        mLettersPaint.reset();
-        mLettersPaint.setStyle(Paint.Style.STROKE);
-        mLettersPaint.setColor(mTextColor);
-        mLettersPaint.setAntiAlias(true);
-        canvas.drawRoundRect(rectF, mTextSize, mTextSize, mLettersPaint);
-
-        for (int i = 0; i < mLetters.size(); i++) {
-            mLettersPaint.reset();
-            mLettersPaint.setColor(mTextColor);
-            mLettersPaint.setAntiAlias(true);
-            mLettersPaint.setTextSize(mTextSize);
-            mLettersPaint.setTextAlign(Paint.Align.CENTER);
-
-            Paint.FontMetrics fontMetrics = mLettersPaint.getFontMetrics();
+        for(int i = 0; i < this.mLetters.size(); ++i) {
+            this.mLettersPaint.reset();
+            this.mLettersPaint.setColor(this.mTextColor);
+            this.mLettersPaint.setAntiAlias(true);
+            this.mLettersPaint.setTextSize(this.mTextSize);
+            this.mLettersPaint.setTextAlign(Align.CENTER);
+            FontMetrics fontMetrics = this.mLettersPaint.getFontMetrics();
             float baseline = Math.abs(-fontMetrics.bottom - fontMetrics.top);
-
-            float posY = mItemHeight * i + baseline / 2 + mPadding;
-
-            if (i == mChoose) {
-                mPosY = posY;
+            float posY = (float)(this.mItemHeight * i) + baseline / 2.0F + (float)this.mPadding;
+            if(i == this.mChoose) {
+                this.mPosY = posY;
             } else {
-                canvas.drawText(mLetters.get(i), mPosX, posY, mLettersPaint);
+                canvas.drawText((String)this.mLetters.get(i), this.mPosX, posY, this.mLettersPaint);
             }
         }
 
     }
 
     private void drawChooseText(Canvas canvas) {
-        if (mChoose != -1) {
-            // 绘制右侧选中字符
-            mLettersPaint.reset();
-            mLettersPaint.setColor(mTextColorChoose);
-            mLettersPaint.setTextSize(mTextSize);
-            mLettersPaint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText(mLetters.get(mChoose), mPosX, mPosY, mLettersPaint);
-
-            // 绘制提示字符
-            if (mRatio >= 0.9f) {
-                String target = mLetters.get(mChoose);
-                Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
+        if(this.mChoose != -1) {
+            this.mLettersPaint.reset();
+            this.mLettersPaint.setColor(this.mTextColorChoose);
+            this.mLettersPaint.setTextSize(this.mTextSize);
+            this.mLettersPaint.setTextAlign(Align.CENTER);
+            canvas.drawText((String)this.mLetters.get(this.mChoose), this.mPosX, this.mPosY, this.mLettersPaint);
+            if(this.mRatio >= 0.9F) {
+                String target = (String)this.mLetters.get(this.mChoose);
+                FontMetrics fontMetrics = this.mTextPaint.getFontMetrics();
                 float baseline = Math.abs(-fontMetrics.bottom - fontMetrics.top);
-                float x = mBallCentreX;
-                float y = mCenterY + baseline / 2;
-                canvas.drawText(target, x, y, mTextPaint);
+                float x = this.mBallCentreX;
+                float y = (float)this.mCenterY + baseline / 2.0F;
+                canvas.drawText(target, x, y, this.mTextPaint);
             }
         }
+
     }
 
-    /**
-     * 绘制波浪
-     *
-     * @param canvas
-     */
     private void drawWavePath(Canvas canvas) {
-        mWavePath.reset();
-        // 移动到起始点
-        mWavePath.moveTo(mWidth, mCenterY - 3 * mRadius);
-        //计算上部控制点的Y轴位置
-        int controlTopY = mCenterY - 2 * mRadius;
-
-        //计算上部结束点的坐标
-        int endTopX = (int) (mWidth - mRadius * Math.cos(ANGLE) * mRatio);
-        int endTopY = (int) (controlTopY + mRadius * Math.sin(ANGLE));
-        mWavePath.quadTo(mWidth, controlTopY, endTopX, endTopY);
-
-        //计算中心控制点的坐标
-        int controlCenterX = (int) (mWidth - 1.8f * mRadius * Math.sin(ANGLE_R) * mRatio);
-        int controlCenterY = mCenterY;
-        //计算下部结束点的坐标
-        int controlBottomY = mCenterY + 2 * mRadius;
-        int endBottomX = endTopX;
-        int endBottomY = (int) (controlBottomY - mRadius * Math.cos(ANGLE));
-        mWavePath.quadTo(controlCenterX, controlCenterY, endBottomX, endBottomY);
-
-        mWavePath.quadTo(mWidth, controlBottomY, mWidth, controlBottomY + mRadius);
-
-        mWavePath.close();
-        canvas.drawPath(mWavePath, mWavePaint);
+        this.mWavePath.reset();
+        this.mWavePath.moveTo((float)this.mWidth, (float)(this.mCenterY - 3 * this.mRadius));
+        int controlTopY = this.mCenterY - 2 * this.mRadius;
+        int endTopX = (int)((double)this.mWidth - (double)this.mRadius * Math.cos(0.7853981633974483D) * (double)this.mRatio);
+        int endTopY = (int)((double)controlTopY + (double)this.mRadius * Math.sin(0.7853981633974483D));
+        this.mWavePath.quadTo((float)this.mWidth, (float)controlTopY, (float)endTopX, (float)endTopY);
+        int controlCenterX = (int)((double)this.mWidth - (double)(1.8F * (float)this.mRadius) * Math.sin(1.5707963267948966D) * (double)this.mRatio);
+        int controlCenterY = this.mCenterY;
+        int controlBottomY = this.mCenterY + 2 * this.mRadius;
+        int endBottomY = (int)((double)controlBottomY - (double)this.mRadius * Math.cos(0.7853981633974483D));
+        this.mWavePath.quadTo((float)controlCenterX, (float)controlCenterY, (float)endTopX, (float)endBottomY);
+        this.mWavePath.quadTo((float)this.mWidth, (float)controlBottomY, (float)this.mWidth, (float)(controlBottomY + this.mRadius));
+        this.mWavePath.close();
+        canvas.drawPath(this.mWavePath, this.mWavePaint);
     }
 
     private void drawBallPath(Canvas canvas) {
-        //x轴的移动路径
-        mBallCentreX = (mWidth + mBallRadius) - (2.0f * mRadius + 2.0f * mBallRadius) * mRatio;
-
-        mBallPath.reset();
-        mBallPath.addCircle(mBallCentreX, mCenterY, mBallRadius, Path.Direction.CW);
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT) {
-            mBallPath.op(mWavePath, Path.Op.DIFFERENCE);
+        this.mBallCentreX = (float)(this.mWidth + this.mBallRadius) - (2.0F * (float)this.mRadius + 2.0F * (float)this.mBallRadius) * this.mRatio;
+        this.mBallPath.reset();
+        this.mBallPath.addCircle(this.mBallCentreX, (float)this.mCenterY, (float)this.mBallRadius, Direction.CW);
+        if(VERSION.SDK_INT >= 19) {
+            this.mBallPath.op(this.mWavePath, Op.DIFFERENCE);
         }
 
-        mBallPath.close();
-        canvas.drawPath(mBallPath, mWavePaint);
-
+        this.mBallPath.close();
+        canvas.drawPath(this.mBallPath, this.mWavePaint);
     }
-
 
     private void startAnimator(float... value) {
-        if (mRatioAnimator == null) {
-            mRatioAnimator = new ValueAnimator();
+        if(this.mRatioAnimator == null) {
+            this.mRatioAnimator = new ValueAnimator();
         }
-        mRatioAnimator.cancel();
-        mRatioAnimator.setFloatValues(value);
-        mRatioAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
+
+        this.mRatioAnimator.cancel();
+        this.mRatioAnimator.setFloatValues(value);
+        this.mRatioAnimator.addUpdateListener(new AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator value) {
-                mRatio = (float) value.getAnimatedValue();
-                invalidate();
+                WaveSideBarView.this.mRatio = ((Float)value.getAnimatedValue()).floatValue();
+                WaveSideBarView.this.invalidate();
             }
         });
-        mRatioAnimator.start();
+        this.mRatioAnimator.start();
     }
 
-
-    public void setOnTouchLetterChangeListener(OnTouchLetterChangeListener listener) {
+    public void setOnTouchLetterChangeListener(WaveSideBarView.OnTouchLetterChangeListener listener) {
         this.listener = listener;
     }
 
     public List<String> getLetters() {
-        return mLetters;
+        return this.mLetters;
     }
 
     public void setLetters(List<String> letters) {
         this.mLetters = letters;
-        invalidate();
+        this.invalidate();
     }
 
     public interface OnTouchLetterChangeListener {
-        void onLetterChange(String letter);
+        void onLetterChange(String var1);
     }
 }
