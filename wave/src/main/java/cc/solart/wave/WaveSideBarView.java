@@ -3,7 +3,7 @@
 // (powered by Fernflower decompiler)
 //
 
-package io.jasontsang.pandora.widget;
+package cc.solart.wave;
 
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
